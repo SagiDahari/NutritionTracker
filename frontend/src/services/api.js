@@ -1,59 +1,98 @@
 import axios from 'axios';
 
-const BACKEND_SERVICE_URL = "http://localhost:5000"
+const API_URL = "http://localhost:5000/api";
 
 const apiClient = axios.create({
-    baseURL: BACKEND_SERVICE_URL,
+    baseURL: API_URL,
+    withCredentials: true,  // for cookies
     headers: {
         'Content-Type': 'application/json'
     }
-})
+});
 
 const api = {
-    // Search foods
+    // ==================
+    // AUTH ROUTES
+    // ==================
+    
+    register: async (userData) => {
+        const { data } = await apiClient.post('/auth/register', userData);
+        return data;
+    },
+
+    login: async (credentials) => {
+        const { data } = await apiClient.post('/auth/login', credentials);
+        return data;
+    },
+
+    logout: async () => {
+        const { data } = await apiClient.post('/auth/logout');
+        return data;
+    },
+
+    getCurrentUser: async () => {
+        const { data } = await apiClient.get('/auth/me');
+        return data;
+    },
+
+    // ==================
+    // FOOD ROUTES
+    // ==================
+    
     searchFoods: async (query) => {
-        const { data } = await apiClient.get('/search-food', {
-        params: { food: query }
+        const { data } = await apiClient.get('/foods/search', {
+            params: { food: query }
         });
         return data;
     },
-    // Get food by fdcId
+
     getFood: async (fdcId) => {
-        const { data } = await apiClient.get(`/food/${fdcId}`);
+        const { data } = await apiClient.get(`/foods/${fdcId}`);
         return data;
     },
 
-    // Add a food to a meal
-    logFood: async (foodData) => {
-        const { data } = await apiClient.post('/log-food',foodData);
-        return data
-    },
-
-    // Get all the meals of the day
+    // ==================
+    // MEAL ROUTES
+    // ==================
+    
     getMeals: async (date) => {
         const { data } = await apiClient.get(`/meals/${date}`);
         return data;
     },
 
-    // Get meal by ID
     getMeal: async (mealId) => {
-        const { data } = await apiClient.get(`/meal/${mealId}`)
-        return data
+        const { data } = await apiClient.get(`/meals/meal/${mealId}`);
+        return data;
     },
 
-    // Delete food from a specific meal
-    deleteFood: async (mealId,fdcId) => {
-        const { data } = await apiClient.delete(`/delete-food/${mealId}/${fdcId}`)
-        return data
+    logFood: async (foodData) => {
+        const { data } = await apiClient.post('/meals/log-food', foodData);
+        return data;
     },
 
-    // Delete Meal.
+    deleteFood: async (mealId, fdcId) => {
+        const { data } = await apiClient.delete(`/meals/delete-food/${mealId}/${fdcId}`);
+        return data;
+    },
+
     deleteMeal: async (mealId) => {
-        const { data } = await apiClient.delete(`/delete-meal/${mealId}`)
-        return data
+        const { data } = await apiClient.delete(`/meals/delete-meal/${mealId}`);
+        return data;
+    },
+
+    // ==================
+    // USER/GOALS ROUTES
+    // ==================
+    
+    getUserGoals: async () => {
+        const { data } = await apiClient.get('/users/goals');
+        return data;
+    },
+
+    updateUserGoals: async (goals) => {
+        const { data } = await apiClient.put('/users/goals', goals);
+        return data;
     }
-
-
-}
+};
 
 export default api;

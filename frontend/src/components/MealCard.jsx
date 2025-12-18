@@ -4,12 +4,12 @@ import AddFoodForm from './AddFoodForm'
 
 function MealCard (props) {
 
-    const { meal, onDeletedFood } = props;
+    const { meal, onFoodDeleted } = props;
     const [showAddForm, setShowAddForm] = useState(false);
 
     const handleFoodAdded = () => {
         setShowAddForm(false); // Close the form
-        onDeletedFood(); // Refresh meals (reusing the callback) maybe i should rename it, (loadMeals function in Dashboard)
+        onFoodDeleted(); // Refresh meals (reusing the callback) maybe i should rename it, (loadMeals function in Dashboard)
     };
 
 
@@ -30,7 +30,7 @@ function MealCard (props) {
                     key={food.fdcId}
                     food={food}
                     mealId={meal.id}
-                    onDelete={onDeletedFood}
+                    onDelete={onFoodDeleted}
                     />
                     }) : <p>No foods are logged in this specific meal yet</p>
                 }

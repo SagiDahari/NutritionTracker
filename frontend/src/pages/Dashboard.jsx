@@ -1,14 +1,9 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
-import MealCard from '../components/MealCard'
+import MealCard from '../components/MealCard';
 
 function Dashboard() {
-
-    const [date ,setDate] = useState(new Date().toISOString().slice(0,10));
-    const [day, setDay] = useState (new Date().getDay()) // 0 for Sunday 1 for Monday and so on.. 
-    const [month, setMonth] = useState(new Date().getMonth()) // 0 for January and so on..
-    const [greeting, setGreeting] = useState('');
-
+    const [date, setDate] = useState(new Date().toISOString().slice(0,10));
     const [meals, setMeals] = useState({});
     const [dailyTotals, setDailyTotals] = useState({
         calories: 0,
@@ -16,7 +11,7 @@ function Dashboard() {
         protein: 0,
         fats: 0
     });
-     const [goals, setGoals] = useState({
+    const [goals, setGoals] = useState({
         calories: 2000,
         protein: 150,
         carbohydrates: 250,
@@ -24,16 +19,35 @@ function Dashboard() {
     });
     const [loading, setLoading] = useState(true);
 
+    // Load goals from API
+    useEffect(() => {
+        loadGoals();
+    }, []);
+
+    // Load meals when date changes
+    useEffect(() => {
+        loadMeals();
+    }, [date]);
+
+    const loadGoals = async () => {
+        try {
+            const data = await api.getUserGoals();
+            setGoals(data);
+        } catch (error) {
+            console.error('Error loading goals:', error);
+        }
+    };
+
     const loadMeals = async () => {
         try {
-        setLoading(true);
-        const data = await api.getMeals(date);
-        setMeals(data.dailyMeals);
-        setDailyTotals(data.dailyTotals);
+            setLoading(true);
+            const data = await api.getMeals(date);
+            setMeals(data.dailyMeals);
+            setDailyTotals(data.dailyTotals);
         } catch (error) {
-        console.error('Error loading meals:', error);
+            console.error('Error loading meals:', error);
         } finally {
-        setLoading(false);
+            setLoading(false);
         }
     };
 
@@ -41,36 +55,19 @@ function Dashboard() {
         return goal > 0 ? Math.round((actual / goal) * 100) : 0;
     };
 
-
-    useEffect(() => {
-        const savedGoals = localStorage.getItem('nutritionGoals');
-        if (savedGoals) {
-            setGoals(JSON.parse(savedGoals));
-        }
-    }, []);
-
-    useEffect(() => {
-        loadMeals();
-    }, [date]);
-
-  
-
-    // Might add a loading screen, line is up for changes.
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div className="loading-container"><div className="loading-spinner"></div></div>;
 
     return (
         <div className="dashboard">
-        <h1>Calorie Tracker</h1>
-        <input 
-            type="date" 
-            value={date} 
-            onChange={(e) => {
-                console.log('Date changed to:', e.target.value)
-                setDate(e.target.value)
-            }}
-        />
+            <h1>Calorie Tracker</h1>
+            
+            <input 
+                type="date" 
+                value={date} 
+                onChange={(e) => setDate(e.target.value)}
+            />
 
-        <div className="daily-summary">
+            <div className="daily-summary">
                 <h2>Daily Totals</h2>
                 
                 <div className="macro-progress">
@@ -140,18 +137,17 @@ function Dashboard() {
                 </div>
             </div>
 
-        <div className="meals-container">
-      {Object.keys(meals).length === 0 ? (
-        <p>No meals logged for this date. Start tracking!</p>
-      ) : (
-        Object.values(meals).map(meal => (
-          <MealCard key={meal.id} meal={meal}
-          onDeletedFood={loadMeals}/>
-        ))
-      )}
-    </div>
+            <div className="meals-container">
+                {Object.values(meals).map(meal => (
+                    <MealCard 
+                        key={meal.id} 
+                        meal={meal}
+                        onFoodDeleted={loadMeals}
+                    />
+                ))}
+            </div>
         </div>
-        );
-    }
+    );
+}
 
-    export default Dashboard;
+export default Dashboard;

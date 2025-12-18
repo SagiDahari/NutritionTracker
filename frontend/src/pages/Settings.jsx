@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import api from '../services/api'
 
 function Settings() {
     const [goals, setGoals] = useState({
@@ -10,13 +11,18 @@ function Settings() {
     const [loading, setLoading] = useState(false);
     const [saved, setSaved] = useState(false);
 
-    // Load goals from localStorage on mount
     useEffect(() => {
-        const savedGoals = localStorage.getItem('nutritionGoals');
-        if (savedGoals) {
-            setGoals(JSON.parse(savedGoals));
-        }
+        loadGoals();
     }, []);
+
+    const loadGoals = async () => {
+        try {
+            const data = await api.getUserGoals();
+            setGoals(data);
+        } catch (error) {
+            console.error('Error loading goals:', error);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -27,21 +33,23 @@ function Settings() {
         setSaved(false); // Reset saved indicator when editing
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
         
-        localStorage.setItem('nutritionGoals', JSON.stringify(goals));
-
-        setTimeout(() => {
-            setLoading(false);
+        try {
+            await api.updateUserGoals(goals);
             setSaved(true);
-            
-            // Hide success message after 3 seconds
             setTimeout(() => setSaved(false), 3000);
-        }, 500);
+        } catch (error) {
+            console.error('Error saving goals:', error);
+            alert('Failed to save goals');
+        } finally {
+            setLoading(false);
+        }
     };
+
 
     const handleReset = () => {
         const defaultGoals = {
