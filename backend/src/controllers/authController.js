@@ -12,7 +12,9 @@ export const register = async (req, res) => {
     }
 
     if (password.length < 8) {
-      return res.status(400).json({ error: 'Password must be at least 8 characters' });
+      return res
+        .status(400)
+        .json({ error: 'Password must be at least 8 characters' });
     }
 
     // Check if user already exists
@@ -38,10 +40,7 @@ export const register = async (req, res) => {
     const user = result.rows[0];
 
     // Create default goals for user
-    await db.query(
-      'INSERT INTO user_goals (user_id) VALUES ($1)',
-      [user.id]
-    );
+    await db.query('INSERT INTO user_goals (user_id) VALUES ($1)', [user.id]);
 
     // Generate JWT token
     const token = jwt.sign(
@@ -55,7 +54,7 @@ export const register = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     res.status(201).json({
@@ -63,10 +62,9 @@ export const register = async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        username: user.username
-      }
+        username: user.username,
+      },
     });
-
   } catch (error) {
     console.error('Register error:', error);
     res.status(500).json({ error: 'Registration failed' });
@@ -113,7 +111,7 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     res.json({
@@ -121,10 +119,9 @@ export const login = async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        username: user.username
-      }
+        username: user.username,
+      },
     });
-
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Login failed' });

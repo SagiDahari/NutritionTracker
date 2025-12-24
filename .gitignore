@@ -12,8 +12,9 @@ Thumbs.db
 # Environment variables
 ############################
 .env
-.env.*
-!.env.example
+.env.test
+.env.local
+.env.*.local
 
 ############################
 # Node / JavaScript
@@ -67,3 +68,10 @@ coverage/
 # Git
 ############################
 .git/
+
+############################
+# Linter
+############################
+.eslintrc.json
+.prettierrc
+.eslint.config.js

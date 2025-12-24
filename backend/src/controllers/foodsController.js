@@ -8,16 +8,16 @@ export const searchFood = async (req, res) => {
     const { food } = req.query;
 
     if (!food) {
-      return res.status(400).json({ error: "Query parameter is required" });
+      return res.status(400).json({ error: 'Query parameter is required' });
     }
 
     const response = await axios.get(URL, {
       headers: {
-        'x-api-key': process.env.API_KEY
+        'x-api-key': process.env.API_KEY,
       },
       params: {
         query: food,
-      }
+      },
     });
 
     const result = response.data;
@@ -46,7 +46,10 @@ export const searchFood = async (req, res) => {
 
     res.json(foodsList);
   } catch (error) {
-    console.error('Search food error:', error.response ? error.response.data : error.message);
+    console.error(
+      'Search food error:',
+      error.response ? error.response.data : error.message
+    );
     res.status(500).json({ error: 'Something went wrong' });
   }
 };
@@ -55,10 +58,14 @@ export const getFood = async (req, res) => {
   try {
     const { fdcId } = req.params;
 
+    if (!fdcId) {
+      return res.status(400).json({error: 'invalid fdcId'})
+    }
+    
     const food = await getOrCacheFood(fdcId);
     res.json(food);
   } catch (error) {
     console.error('Get food error:', error);
-    res.status(500).json({ error: "Failed to fetch food data" });
+    res.status(400).json({ error: 'Failed to fetch food data' });
   }
 };

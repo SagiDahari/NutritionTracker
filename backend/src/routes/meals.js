@@ -1,7 +1,13 @@
-import express from 'express'
-import { getMealsByDate, getMealById, logFood, deleteFood, deleteMeal } from '../controllers/mealsController.js'
-import { authenticateToken } from '../middleware/auth.js'
-import { schemas, validate } from '../middleware/validation.js'
+import express from 'express';
+import {
+  getMealsByDate,
+  getMealById,
+  logFood,
+  deleteFood,
+  deleteMeal,
+} from '../controllers/mealsController.js';
+import { authenticateToken } from '../middleware/auth.js';
+import { schemas, validate } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -317,6 +323,6 @@ router.delete('/delete-food/:mealId/:fdcId', authenticateToken, deleteFood);
  *       404:
  *         description: Meal not found
  */
-router.delete('/delete-meal/:mealId', authenticateToken, deleteMeal); 
+router.delete('/delete-meal/:mealId', authenticateToken, deleteMeal);
 
 export default router;

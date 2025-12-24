@@ -9,15 +9,14 @@ export const getUserGoals = async (req, res) => {
 
     if (result.rows.length === 0) {
       // Create default goals if they don't exist
-      await db.query(
-        'INSERT INTO user_goals (user_id) VALUES ($1)',
-        [req.user.userId]
-      );
+      await db.query('INSERT INTO user_goals (user_id) VALUES ($1)', [
+        req.user.userId,
+      ]);
       return res.json({
         calories: 2000,
         protein: 150,
         carbohydrates: 250,
-        fats: 65
+        fats: 65,
       });
     }
 
@@ -32,11 +31,6 @@ export const updateUserGoals = async (req, res) => {
   try {
     const { calories, protein, carbohydrates, fats } = req.body;
 
-    // Validation
-    if (!calories || !protein || !carbohydrates || !fats) {
-      return res.status(400).json({ error: 'All goal values are required' });
-    }
-
     await db.query(
       `UPDATE user_goals 
        SET calories = $1, protein = $2, carbohydrates = $3, fats = $4, updated_at = NOW()
@@ -46,7 +40,7 @@ export const updateUserGoals = async (req, res) => {
 
     res.json({
       message: 'Goals updated successfully',
-      goals: { calories, protein, carbohydrates, fats }
+      goals: { calories, protein, carbohydrates, fats },
     });
   } catch (error) {
     console.error('Update goals error:', error);

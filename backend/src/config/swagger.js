@@ -6,7 +6,8 @@ const options = {
     info: {
       title: 'Nutrition Tracker API',
       version: '1.0.0',
-      description: 'A comprehensive nutrition tracking API with user authentication and meal management',
+      description:
+        'A comprehensive nutrition tracking API with user authentication and meal management',
       contact: {
         name: 'Sagi Dahari',
         email: 'sagidahari7@gmail.com',
@@ -25,7 +26,8 @@ const options = {
       },
       {
         name: 'Meals',
-        description: 'Meal management endpoints (view, add, delete meals and foods)',
+        description:
+          'Meal management endpoints (view, add, delete meals and foods)',
       },
       {
         name: 'Foods',
@@ -42,7 +44,8 @@ const options = {
           type: 'apiKey',
           in: 'cookie',
           name: 'token',
-          description: 'JWT token stored in httpOnly cookie. Login to receive the token.',
+          description:
+            'JWT token stored in httpOnly cookie. Login to receive the token.',
         },
       },
     },

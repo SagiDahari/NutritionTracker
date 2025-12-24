@@ -10,14 +10,14 @@ async function getOrCreateMealsForDate(userId, date) {
   );
 
   const existingMeals = result.rows;
-  const existingMealTypes = existingMeals.map(m => m.meal_type);
+  const existingMealTypes = existingMeals.map((m) => m.meal_type);
 
   // Define all required meal types
   const allMealTypes = ['breakfast', 'lunch', 'dinner', 'snack'];
 
   // Find missing meal types
   const missingMealTypes = allMealTypes.filter(
-    type => !existingMealTypes.includes(type)
+    (type) => !existingMealTypes.includes(type)
   );
 
   // Create missing meals
@@ -38,7 +38,7 @@ export const getMealsByDate = async (req, res) => {
     const userId = req.user.userId; // From JWT token!
 
     if (!mealDate) {
-      return res.status(400).json({ error: "Date parameter is required" });
+      return res.status(400).json({ error: 'Date parameter is required' });
     }
 
     // Ensure all 4 meals exist for this user and date
@@ -96,7 +96,7 @@ export const getMealsByDate = async (req, res) => {
             calories: 0,
             carbohydrates: 0,
             protein: 0,
-            fats: 0
+            fats: 0,
           };
         }
 
@@ -143,20 +143,20 @@ export const getMealsByDate = async (req, res) => {
     }
 
     res.json({ dailyMeals, dailyTotals });
-
   } catch (error) {
     console.error('Get meals error:', error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: 'Something went wrong' });
   }
 };
 
-export const getMealById = async (req, res) => { // Not relevant for the UI 
+export const getMealById = async (req, res) => {
+  // Not relevant for the UI
   try {
     const { id } = req.params;
     const userId = req.user.userId;
 
     if (!id) {
-      return res.status(400).json({ error: "Meal ID is required" });
+      return res.status(400).json({ error: 'Meal ID is required' });
     }
 
     // Query with user_id check to ensure user can only access their own meals
@@ -182,7 +182,7 @@ export const getMealById = async (req, res) => { // Not relevant for the UI
 
     if (result.rows.length === 0) {
       return res.status(404).json({
-        error: "Meal not found or you don't have permission to access it"
+        error: "Meal not found or you don't have permission to access it",
       });
     }
 
@@ -191,7 +191,7 @@ export const getMealById = async (req, res) => { // Not relevant for the UI
       type: result.rows[0].meal_type,
       date: result.rows[0].meal_date,
       foods: {},
-      totals: { calories: 0, carbohydrates: 0, protein: 0, fats: 0 }
+      totals: { calories: 0, carbohydrates: 0, protein: 0, fats: 0 },
     };
 
     for (let row of result.rows) {
@@ -204,7 +204,7 @@ export const getMealById = async (req, res) => { // Not relevant for the UI
           calories: 0,
           carbohydrates: 0,
           protein: 0,
-          fats: 0
+          fats: 0,
         };
       }
 
@@ -235,10 +235,9 @@ export const getMealById = async (req, res) => { // Not relevant for the UI
     }
 
     res.json(meal);
-
   } catch (error) {
     console.error('Get meal error:', error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: 'Something went wrong' });
   }
 };
 
@@ -248,7 +247,9 @@ export const logFood = async (req, res) => {
     const userId = req.user.userId;
 
     if (!fdcId || !mealId || !quantity) {
-      return res.status(400).json({ error: "fdcId, mealId, and quantity are required" });
+      return res
+        .status(400)
+        .json({ error: 'fdcId, mealId, and quantity are required' });
     }
 
     // Verify that the meal belongs to this user
@@ -258,7 +259,9 @@ export const logFood = async (req, res) => {
     );
 
     if (mealCheck.rows.length === 0) {
-      return res.status(403).json({ error: "You don't have permission to add food to this meal" });
+      return res
+        .status(403)
+        .json({ error: "You don't have permission to add food to this meal" });
     }
 
     const foodData = await getOrCacheFood(fdcId);
@@ -271,10 +274,10 @@ export const logFood = async (req, res) => {
       [mealId, fdcId, quantity]
     );
 
-    res.json({ message: "Food logged successfully!", food: foodData });
+    res.json({ message: 'Food logged successfully!', food: foodData });
   } catch (error) {
     console.error('Log food error:', error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: 'Something went wrong' });
   }
 };
 
@@ -284,7 +287,9 @@ export const deleteFood = async (req, res) => {
     const userId = req.user.userId;
 
     if (!mealId || !fdcId) {
-      return res.status(400).json({ error: "Meal ID and Food ID are required" });
+      return res
+        .status(400)
+        .json({ error: 'Meal ID and Food ID are required' });
     }
 
     // Verify that the meal belongs to this user
@@ -294,59 +299,61 @@ export const deleteFood = async (req, res) => {
     );
 
     if (mealCheck.rows.length === 0) {
-      return res.status(403).json({ error: "You don't have permission to modify this meal" });
+      return res
+        .status(403)
+        .json({ error: "You don't have permission to modify this meal" });
     }
 
     const result = await db.query(
-      "DELETE FROM meal_foods WHERE meal_id = $1 AND food_id = $2 RETURNING food_id;",
+      'DELETE FROM meal_foods WHERE meal_id = $1 AND food_id = $2 RETURNING food_id;',
       [mealId, fdcId]
     );
 
     if (result.rowCount === 0) {
       return res.status(404).json({
-        error: "Food not found in this meal"
+        error: 'Food not found in this meal',
       });
     }
 
     res.status(200).json({
       message: `Food with ID ${fdcId} deleted successfully from meal ${mealId}`,
-      deletedFoodId: result.rows[0].food_id
+      deletedFoodId: result.rows[0].food_id,
     });
   } catch (error) {
     console.error('Delete food error:', error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: 'Something went wrong' });
   }
 };
 
-export const deleteMeal = async (req, res) => { // Not relevant for the UI 
+export const deleteMeal = async (req, res) => {
+  // Not relevant for the UI
   try {
     const { mealId } = req.params;
     const userId = req.user.userId;
 
     if (!mealId) {
-      return res.status(400).json({ error: "Meal ID is required" });
+      return res.status(400).json({ error: 'Meal ID is required' });
     }
 
     // Delete only if the meal belongs to this user
     const result = await db.query(
-      "DELETE FROM meals WHERE id = $1 AND user_id = $2 RETURNING meal_type, meal_date",
+      'DELETE FROM meals WHERE id = $1 AND user_id = $2 RETURNING meal_type, meal_date',
       [mealId, userId]
     );
 
     if (result.rowCount === 0) {
       return res.status(404).json({
-        error: "Meal not found or you don't have permission to delete it"
+        error: "Meal not found or you don't have permission to delete it",
       });
     }
 
     res.status(200).json({
       message: `Meal ${mealId} was deleted`,
       deletedMealType: result.rows[0].meal_type,
-      deletedMealDate: result.rows[0].meal_date
+      deletedMealDate: result.rows[0].meal_date,
     });
-
   } catch (error) {
     console.error('Delete meal error:', error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: 'Something went wrong' });
   }
 };

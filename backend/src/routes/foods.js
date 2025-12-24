@@ -1,5 +1,5 @@
-import express from 'express'
-import { searchFood, getFood } from '../controllers/foodsController.js'
+import express from 'express';
+import { searchFood, getFood } from '../controllers/foodsController.js';
 
 const router = express.Router();
 

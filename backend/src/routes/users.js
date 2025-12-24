@@ -1,7 +1,10 @@
 import express from 'express';
-import { getUserGoals, updateUserGoals } from '../controllers/usersController.js';
+import {
+  getUserGoals,
+  updateUserGoals,
+} from '../controllers/usersController.js';
 import { authenticateToken } from '../middleware/auth.js';
-import { schemas, validate } from '../middleware/validation.js'
+import { schemas, validate } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -123,6 +126,11 @@ router.get('/goals', authenticateToken, getUserGoals);
  *       500:
  *         description: Failed to update goals
  */
-router.put('/goals', authenticateToken, validate(schemas.updateGoals), updateUserGoals);
+router.put(
+  '/goals',
+  authenticateToken,
+  validate(schemas.updateGoals),
+  updateUserGoals
+);
 
 export default router;

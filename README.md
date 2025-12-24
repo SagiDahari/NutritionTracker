@@ -261,6 +261,16 @@ http://localhost:5000/api-docs
 | PUT | `/api/users/goals` | Update goals | Yes |
 
 ## 🧪 Running Tests
+
+### 1. Environment Variables
+
+Create `.env.test` file:
+```bash
+cp .env.test.example .env.test
+# Edit .env.test with your test database credentials
+```
+### 2. Run Tests
+
 ```bash
 cd backend
 npm test
@@ -270,6 +280,7 @@ npm test
 ```
 nutrition-tracker/
 ├── backend/
+│   ├── __tests__/
 │   ├── db/
 │   │   ├── init.sql
 │   ├── src/
