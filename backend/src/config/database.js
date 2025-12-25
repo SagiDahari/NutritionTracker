@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === 'test') {
 let db;
 // Production 
 if (process.env.DATABASE_URL) {
-  db = new Pool({
+  db = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false }
   });
