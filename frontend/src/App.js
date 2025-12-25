@@ -6,7 +6,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
-import './App.css';
+//import './App.css';
+import './styles/theme.css';
 
 function App() {
   const { isAuthenticated, loading } = useAuth();

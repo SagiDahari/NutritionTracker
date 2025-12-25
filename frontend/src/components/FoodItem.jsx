@@ -5,11 +5,8 @@ function FoodItem(props) {
     const {food, mealId, onDelete} = props;
 
     const handleDelete = async () => {
-        console.log('handleDelete type:', typeof handleDelete); // Should be "function"
         try {
-            console.log('Deleting food...');
             await api.deleteFood(mealId, food.fdcId);
-            console.log('Food deleted successfully!');
             onDelete();
         } catch (error) {
             console.error('Error deleting food:', error);

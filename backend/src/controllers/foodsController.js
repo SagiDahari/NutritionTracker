@@ -23,8 +23,11 @@ export const searchFood = async (req, res) => {
     const result = response.data;
     const foodsList = [];
 
+    const nutrientTypes = ['Energy','Protein','Carbohydrate, by difference', 'Total lipid (fat)']
+
     for (let food of result.foods) {
       let nutrients = {};
+      
 
       for (let nutrient of food.foodNutrients) {
         if ([1008, 1005, 1004, 1003].includes(nutrient.nutrientId)) {
@@ -32,6 +35,13 @@ export const searchFood = async (req, res) => {
             nutrients[nutrient.nutrientName] = nutrient.value;
           }
         }
+      }
+
+      let missingNutrients = nutrientTypes.filter((type) => 
+         (!Object.keys(nutrients).includes(type)));
+
+      for (let missingNutrient of missingNutrients) {
+        nutrients[missingNutrient] = 0
       }
 
       const foodData = {

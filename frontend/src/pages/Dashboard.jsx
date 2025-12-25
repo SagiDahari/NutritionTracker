@@ -3,7 +3,7 @@ import api from '../services/api';
 import MealCard from '../components/MealCard';
 
 function Dashboard() {
-    const [date, setDate] = useState(new Date().toISOString().slice(0,10));
+    const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
     const [meals, setMeals] = useState({});
     const [dailyTotals, setDailyTotals] = useState({
         calories: 0,
@@ -55,88 +55,144 @@ function Dashboard() {
         return goal > 0 ? Math.round((actual / goal) * 100) : 0;
     };
 
-    if (loading) return <div className="loading-container"><div className="loading-spinner"></div></div>;
+    // Get greeting based on time of day
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        if (hour < 12) return 'Good morning';
+        if (hour < 18) return 'Good afternoon';
+        return 'Good evening';
+    };
+
+    // Calculate gauge values
+    const caloriesPercent = calculatePercentage(dailyTotals.calories, goals.calories);
+    const circumference = 377; // Approximate half-circle circumference for r=120
+    const strokeDashoffset = circumference - (Math.min(caloriesPercent, 100) / 100) * circumference;
+    const caloriesRemaining = Math.max(goals.calories - dailyTotals.calories, 0);
+
+    if (loading) return (
+        <div className="loading-container">
+            <div className="loading-spinner"></div>
+        </div>
+    );
 
     return (
-        <div className="dashboard">
-            <h1>Nutrition Tracker</h1>
-            
-            <input 
-                type="date" 
-                value={date} 
-                onChange={(e) => setDate(e.target.value)}
-            />
+        <div className="dashboard fade-in">
+            {/* Header */}
+            <div className="dashboard-header">
+                <div className="dashboard-greeting">
+                    <h1>{getGreeting()}! 👋</h1>
+                    <p>Let's check your nutrition progress</p>
+                </div>
+                <input 
+                    type="date" 
+                    value={date} 
+                    onChange={(e) => setDate(e.target.value)}
+                />
+            </div>
 
+            {/* Hero Calorie Gauge */}
             <div className="daily-summary">
-                <h2>Daily Totals</h2>
-                
-                <div className="macro-progress">
-                    <div className="macro-item">
-                        <div className="macro-header">
-                            <span className="macro-name">Calories</span>
-                            <span className="macro-values">
-                                {dailyTotals.calories.toFixed(0)} / {goals.calories}
-                            </span>
+                <div className="gauge-container">
+                    <div className="calorie-gauge">
+                        <svg width="260" height="140" viewBox="0 0 260 140">
+                            <defs>
+                                <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stopColor="#4ade80" />
+                                    <stop offset="50%" stopColor="#22c55e" />
+                                    <stop offset="100%" stopColor="#16a34a" />
+                                </linearGradient>
+                            </defs>
+                            {/* Background arc */}
+                            <path 
+                                className="gauge-bg" 
+                                d="M 10 130 A 120 120 0 0 1 250 130" 
+                            />
+                            {/* Progress arc */}
+                            <path 
+                                className="gauge-progress" 
+                                d="M 10 130 A 120 120 0 0 1 250 130"
+                                strokeDasharray={circumference}
+                                strokeDashoffset={strokeDashoffset}
+                            />
+                        </svg>
+                        <div className="gauge-center">
+                            <div className="gauge-calories">{dailyTotals.calories.toFixed(0)}</div>
+                            <div className="gauge-goal">of {goals.calories} kcal</div>
                         </div>
-                        <div className="progress-bar">
-                            <div 
-                                className="progress-fill calories" 
-                                style={{ width: `${Math.min(calculatePercentage(dailyTotals.calories, goals.calories), 100)}%` }}
-                            ></div>
-                        </div>
-                        <span className="percentage">{calculatePercentage(dailyTotals.calories, goals.calories)}%</span>
                     </div>
-
-                    <div className="macro-item">
-                        <div className="macro-header">
-                            <span className="macro-name">Protein</span>
-                            <span className="macro-values">
-                                {dailyTotals.protein.toFixed(1)}g / {goals.protein}g
-                            </span>
+                    
+                    <div className="gauge-stats">
+                        <div className="stat-card">
+                            <div className="stat-value">{caloriesRemaining.toFixed(0)}</div>
+                            <div className="stat-label">Remaining</div>
                         </div>
-                        <div className="progress-bar">
-                            <div 
-                                className="progress-fill protein" 
-                                style={{ width: `${Math.min(calculatePercentage(dailyTotals.protein, goals.protein), 100)}%` }}
-                            ></div>
+                        <div className="stat-card">
+                            <div className="stat-value">{caloriesPercent}%</div>
+                            <div className="stat-label">Daily Goal</div>
                         </div>
-                        <span className="percentage">{calculatePercentage(dailyTotals.protein, goals.protein)}%</span>
-                    </div>
-
-                    <div className="macro-item">
-                        <div className="macro-header">
-                            <span className="macro-name">Carbs</span>
-                            <span className="macro-values">
-                                {dailyTotals.carbohydrates.toFixed(1)}g / {goals.carbohydrates}g
-                            </span>
-                        </div>
-                        <div className="progress-bar">
-                            <div 
-                                className="progress-fill carbs" 
-                                style={{ width: `${Math.min(calculatePercentage(dailyTotals.carbohydrates, goals.carbohydrates), 100)}%` }}
-                            ></div>
-                        </div>
-                        <span className="percentage">{calculatePercentage(dailyTotals.carbohydrates, goals.carbohydrates)}%</span>
-                    </div>
-
-                    <div className="macro-item">
-                        <div className="macro-header">
-                            <span className="macro-name">Fats</span>
-                            <span className="macro-values">
-                                {dailyTotals.fats.toFixed(1)}g / {goals.fats}g
-                            </span>
-                        </div>
-                        <div className="progress-bar">
-                            <div 
-                                className="progress-fill fats" 
-                                style={{ width: `${Math.min(calculatePercentage(dailyTotals.fats, goals.fats), 100)}%` }}
-                            ></div>
-                        </div>
-                        <span className="percentage">{calculatePercentage(dailyTotals.fats, goals.fats)}%</span>
                     </div>
                 </div>
             </div>
 
+            {/* Macro Progress Bars */}
+            <div className="macro-progress">
+                <div className="macro-progress-title">Macronutrients</div>
+                <div className="macro-bars">
+                    {/* Protein */}
+                    <div className="macro-bar-item">
+                        <div className="macro-bar-label">
+                            <span className="macro-dot protein"></span>
+                            <span>Protein</span>
+                        </div>
+                        <div className="macro-bar-track">
+                            <div 
+                                className="macro-bar-fill protein" 
+                                style={{ width: `${Math.min(calculatePercentage(dailyTotals.protein, goals.protein), 100)}%` }}
+                            ></div>
+                        </div>
+                        <div className="macro-bar-values">
+                            <strong>{dailyTotals.protein.toFixed(0)}g</strong> / {goals.protein}g
+                        </div>
+                    </div>
+
+                    {/* Carbs */}
+                    <div className="macro-bar-item">
+                        <div className="macro-bar-label">
+                            <span className="macro-dot carbs"></span>
+                            <span>Carbs</span>
+                        </div>
+                        <div className="macro-bar-track">
+                            <div 
+                                className="macro-bar-fill carbs" 
+                                style={{ width: `${Math.min(calculatePercentage(dailyTotals.carbohydrates, goals.carbohydrates), 100)}%` }}
+                            ></div>
+                        </div>
+                        <div className="macro-bar-values">
+                            <strong>{dailyTotals.carbohydrates.toFixed(0)}g</strong> / {goals.carbohydrates}g
+                        </div>
+                    </div>
+
+                    {/* Fats */}
+                    <div className="macro-bar-item">
+                        <div className="macro-bar-label">
+                            <span className="macro-dot fats"></span>
+                            <span>Fats</span>
+                        </div>
+                        <div className="macro-bar-track">
+                            <div 
+                                className="macro-bar-fill fats" 
+                                style={{ width: `${Math.min(calculatePercentage(dailyTotals.fats, goals.fats), 100)}%` }}
+                            ></div>
+                        </div>
+                        <div className="macro-bar-values">
+                            <strong>{dailyTotals.fats.toFixed(0)}g</strong> / {goals.fats}g
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Meals Section */}
+            <div className="meals-section-title">Today's Meals</div>
             <div className="meals-container">
                 {Object.values(meals).map(meal => (
                     <MealCard 
