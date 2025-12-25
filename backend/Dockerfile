@@ -1,10 +1,13 @@
-FROM node:21
+FROM node:20-alpine
 
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm install
+
+RUN npm ci --only=production
 
 COPY . .
 
 EXPOSE 5000
-CMD ["npx", "nodemon", "src/index.js"]
+
+CMD ["node", "src/index.js"]
