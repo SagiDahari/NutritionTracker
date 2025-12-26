@@ -4,6 +4,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './config/swagger.js';
+import { migrate } from './config/migrate.js'
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -39,4 +40,6 @@ app.use('/api/users', usersRoutes);
 app.use('/api/meals', mealsRoutes);
 app.use('/api/foods', foodsRoutes);
 
-app.listen(PORT, () => console.log(`Server is running on port ${PORT}... and enviorment is ${process.env.NODE_ENV}`));
+migrate().then(() => {
+  app.listen(PORT, () => console.log(`Server is running on port ${PORT}... and enviorment is ${process.env.NODE_ENV}`));
+})
